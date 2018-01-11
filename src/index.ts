@@ -2,7 +2,7 @@ import * as cheerio from 'cheerio';
 import * as nodeurl from 'url';
 import * as request from 'request';
 
-export class OgStatic {
+export default class OgStatic {
     public static readonly DEFAULT_PROTOCOL = 'http';
     public static readonly shorthandProperties = {
         image: 'image:url',
@@ -44,11 +44,12 @@ export class OgStatic {
     public static parse<T>(responseToParse: any, options?: any): T {
         options = options || {};
         let $;
-        if (typeof responseToParse === 'string') {
+        if (typeof responseToParse === 'string')
             $ = cheerio.load(responseToParse);
-        }
-        const $html = $('html');
-        let namespace;
+
+        // Check for xml namespace
+        var namespace,
+            $html = $('html');
 
         if ($html.length)
         {
@@ -64,21 +65,23 @@ export class OgStatic {
                     return false;
                 }
             })
-        } else if (options.strict) {
+        }
+        else if (options.strict)
             return null;
-        }
 
-        if (!namespace) {
-            if (options.strict) {
+        if (!namespace)
+            // If no namespace is explicitly set..
+            if (options.strict)
+                // and strict mode is specified, abort parse.
                 return null;
-            } else {
+            else
+                // and strict mode is not specific, then default to "og"
                 namespace = "og";
-            }
-        }
-        const meta = {},
+
+        var meta = {},
             metaTags = $('meta');
 
-        metaTags.each(() => {
+        metaTags.each(function() {
             var element = $(this),
                 propertyAttr = element.attr('property');
 
@@ -136,10 +139,37 @@ export class OgStatic {
             }
         });
 
+
+        // If no 'og:title', use title tag
+        if(!meta.hasOwnProperty('title')){
+            meta['title'] = $('title').text();
+        }
+
+
+        // Temporary fallback for image meta.
+        // Fallback to the first image on the page.
+        // In the future, the image property could be populated
+        // with an array of images, maybe.
+        if(!meta.hasOwnProperty('image')){
+            var img = $('img');
+
+            // If there are image elements in the page
+            if(img.length){
+                var imgObj: any = {};
+                imgObj.url = $('img').attr('src');
+
+                // Set image width and height properties if respective attributes exist
+                if($('img').attr('width'))
+                    imgObj.width = $('img').attr('width');
+                if($('img').attr('height'))
+                    imgObj.height = $('img').attr('height');
+
+                meta['image'] = imgObj;
+            }
+
+        }
+
         return meta as T;
     }
 
 }
-
-declare const og: OgStatic;
-export default og;
