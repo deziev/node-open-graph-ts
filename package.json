@@ -1,5 +1,5 @@
 {
-  "name": "node-open-graph-ts",
+  "name": "open-graph-ts",
   "version": "0.0.2",
   "description": "Promise based Open Graph implementation for Node.js with typescript support",
   "main": "dist/index.js",
@@ -9,6 +9,7 @@
   },
   "scripts": {
     "test": "gulp test",
+    "compile": "gulp",
     "release": "standard-version"
   },
   "repository": {

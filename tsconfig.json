@@ -8,15 +8,11 @@
       "noUnusedLocals": false,
       "sourceMap": true,
       "declaration": true,
-      "rootDir": "src",
       "outDir": "dist",
       "allowSyntheticDefaultImports": true,
       "removeComments": true,
     },
     "include": [
-      "src/**/*.ts"
-    ],
-    "exclude": [
-        "node_modules"
+      "index.ts"
     ]
   }
